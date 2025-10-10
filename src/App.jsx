@@ -1,16 +1,13 @@
 import React, { useEffect } from 'react';
-import {
-  Routes,
-  Route,
-  useLocation
-} from 'react-router-dom';
+import { useLocation, Route, Routes } from 'react-router-dom'
+
 
 import './css/style.css';
-
 import './charts/ChartjsConfig';
 
 // Import pages
 import Dashboard from './pages/Dashboard';
+import AdminLogin from './pages/Admin/Auth/AdminLogin';
 
 function App() {
 
@@ -25,7 +22,11 @@ function App() {
   return (
     <>
       <Routes>
-        <Route exact path="/" element={<Dashboard />} />
+        {/* //user Routes */}
+        <Route path='/' element={<AdminLogin />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* //Admin Routes */}
       </Routes>
     </>
   );
