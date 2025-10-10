@@ -7,10 +7,13 @@ import UserAvatar from '../images/user-avatar-32.png';
 import { IoIosArrowDown } from "react-icons/io";
 import { AiOutlineLogout } from "react-icons/ai";
 import { IoSettingsOutline } from "react-icons/io5";
+import { useAuth } from '../store/auth';
 
 function DropdownProfile({
   align
 }) {
+
+  const { user } = useAuth();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -49,7 +52,9 @@ function DropdownProfile({
       >
         <img className="w-8 h-8 rounded-full" src={UserAvatar} width="32" height="32" alt="User" />
         <div className="flex items-center truncate">
-          <span className="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 dark:group-hover:text-white">Acme Inc.</span>
+          <span className="truncate ml-2 text-sm font-medium text-gray-600 dark:text-gray-100 group-hover:text-gray-800 dark:group-hover:text-white">
+            {user?.username}
+          </span>
           <IoIosArrowDown className="w-4 h-4 shrink-0 ml-1 fill-current text-gray-400 dark:text-gray-500"/>          
         </div>
       </button>
@@ -70,8 +75,8 @@ function DropdownProfile({
           onBlur={() => setDropdownOpen(false)}
         >
           <div className="pt-0.5 pb-2 px-3 mb-1 border-b border-gray-200 dark:border-gray-700/60">
-            <div className="font-bold text-green-600 dark:text-gray-100">Mafidul Islam</div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 italic">Administrator@gmail.com</div>
+            <div className="font-bold text-green-600 dark:text-gray-100">{user?.username}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 italic">{user?.email}</div>
           </div>
           <ul>
             <li>
