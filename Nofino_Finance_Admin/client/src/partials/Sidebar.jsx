@@ -102,33 +102,21 @@ function Sidebar({
             </h3>
             <ul className="mt-3">
               {/* Dashboard */}
-              <SidebarLinkGroup activecondition={pathname === "/" || pathname.includes("dashboard")}>
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      <a
-                        href="#0"
-                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname === "/" || pathname.includes("dashboard") ? "" : "hover:text-gray-900 dark:hover:text-white"
-                          }`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleClick();
-                          setSidebarExpanded(true);
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <VscDashboard className={`w-5 h-5 shrink-0 fill-current ${pathname === "/" || pathname.includes("dashboard") ? 'text-violet-500' : 'text-gray-600 dark:text-gray-500'}`} />
-                            <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                              Dashboard
-                            </span>
-                          </div>
-                        </div>
-                      </a>
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup>
+              <li className={`pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-linear-to-r ${pathname.includes("dashboard") && "from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]"}`}>
+                <NavLink
+                  end
+                  to="/admin/dashboard"
+                  className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname.includes("dashboard") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                >
+                  <div className="flex items-center">
+                    <VscDashboard className={`w-5 h-5 shrink-0 fill-current ${pathname.includes('contact') ? 'text-violet-500' : 'text-gray-500 dark:text-gray-500'}`}/>
+                    <span className="text-sm font-medium ml-4 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                      Dashboard
+                    </span>
+                  </div>
+                </NavLink>
+              </li>
               {/* User Management */}
               <SidebarLinkGroup activecondition={pathname.includes("userManagement")}>
                 {(handleClick, open) => {
@@ -136,7 +124,7 @@ function Sidebar({
                     <React.Fragment>
                       <a
                         href="#0"
-                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname.includes("ecommerce") ? "" : "hover:text-gray-900 dark:hover:text-white"
+                        className={`block text-gray-800 dark:text-gray-100 truncate transition duration-150 ${pathname.includes("userManagement") ? "" : "hover:text-gray-900 dark:hover:text-white"
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -162,7 +150,7 @@ function Sidebar({
                           <li className="mb-1 last:mb-0">
                             <NavLink
                               end
-                              to="https://cruip.com/mosaic/"
+                              to="/admin/user-list"
                               className={({ isActive }) =>
                                 "block transition duration-150 truncate " + (isActive ? "text-violet-500" : "text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200")
                               }

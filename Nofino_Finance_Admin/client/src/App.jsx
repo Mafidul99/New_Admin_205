@@ -12,6 +12,7 @@ import AdminRegister from './pages/Admin/Auth/AdminRegister';
 import ForgotPassword from './pages/Admin/Auth/ForgotPassword';
 import { Logout } from './pages/Admin/Auth/Logout';
 import AppLayout from './partials/AppLayout';
+import UserList from './pages/view/Users/UserList';
 
 function App() {
 
@@ -36,6 +37,7 @@ function App() {
         {/* //Admin Routes */}
         <Route path='/admin' element={<AppLayout />}> 
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="user-list" element={<UserList />} />
         </Route>
       </Routes>
     </>

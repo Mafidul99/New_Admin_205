@@ -7,6 +7,7 @@
     <meta name="description" content="%VITE_WEB_DESCRIPTION%" />
     <meta name="keywords" content="%VITE_WEB_KEYWORDS%" />
     <title>%VITE_WEB_NAME% | %VITE_WEB_DESCRIPTION%</title>
+    <link href="https://cdn.datatables.net/v/dt/dt-2.3.4/r-3.0.7/datatables.min.css" rel="stylesheet" integrity="sha384-Z5ttuNJ6ZR9dM6rniOsfLKN4Op4xj2U1v0/w92/pqpds3/Nem3vXAWrt8cmEKp5N" crossorigin="anonymous">
     <script>
       if (localStorage.theme === 'dark' || !('theme' in localStorage)) {
         document.querySelector('html').classList.add('dark');
@@ -28,5 +29,6 @@
     </script>   
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script src="https://cdn.datatables.net/v/dt/dt-2.3.4/r-3.0.7/datatables.min.js" integrity="sha384-6RxfddUuMaoet78bYlcqv+T8nOOqcHs9LscIstj5/ojk/ars75NBFqT5TSbAOL2l" crossorigin="anonymous"></script>
   </body>
 </html>
