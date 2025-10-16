@@ -1,0 +1,13 @@
+.dt-buttons .dt-button {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* Hover effect */
+.my-custom-table .dt-buttons .dt-button:hover {
+  background-color: #0056b3;
+}

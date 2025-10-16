@@ -6,13 +6,14 @@ import './css/style.css';
 import './charts/ChartjsConfig';
 
 // Import pages
-import Dashboard from './pages/Dashboard';
 import AdminLogin from './pages/Admin/Auth/AdminLogin';
 import AdminRegister from './pages/Admin/Auth/AdminRegister';
 import ForgotPassword from './pages/Admin/Auth/ForgotPassword';
 import { Logout } from './pages/Admin/Auth/Logout';
 import AppLayout from './partials/AppLayout';
-import UserList from './pages/view/Users/UserList';
+import Dashboard from './pages/Admin/Dashboard';
+import UserList from './pages/Admin/View/Users/UserList';
+import AddNew from './pages/Admin/View/Users/AddNew';
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
         <Route path='/admin' element={<AppLayout />}> 
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="user-list" element={<UserList />} />
+          <Route path="add-new" element={<AddNew />} />
         </Route>
       </Routes>
     </>
