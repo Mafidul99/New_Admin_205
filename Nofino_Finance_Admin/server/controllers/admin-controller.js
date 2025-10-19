@@ -1,9 +1,12 @@
-
 const User = require("../models/user-model");
 
+
+// Allusers getData
 const getAllUsers = async (req, res) => {
     try {
-        const users = await User.find({}, { password: 0});
+        const users = await User.find({}, {
+            password: 0
+        });
         if (!users || users.length === 0) {
             return res.status(404).json({
                 message: "No users found"
@@ -19,10 +22,14 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-
+// Allusers Contacts getData
 const getAllContacts = async (req, res) => {
     try {
-        const users = await User.find({ isContact: true }, { password: 0 });
+        const users = await User.find({
+            isContact: true
+        }, {
+            password: 0
+        });
         if (!users || users.length === 0) {
             return res.status(404).json({
                 message: "No users found"
@@ -38,4 +45,57 @@ const getAllContacts = async (req, res) => {
     }
 };
 
-module.exports = {getAllUsers, getAllContacts};
+
+// getUserById Edit
+const getUserById = async (req, res) =>{
+    try {
+        const id = req.params.id;
+        const data = await User.findOne({_id: id}, {password: 0});
+        return res.status(200).json(data);
+    } catch (error) {
+        next(error);
+    }
+};
+
+// Updarte us user
+const updateUserById = async (req, res) => {
+    try {
+    
+        const id = req.params.id;
+        const updateUserData = req.body;
+
+        const updatedData = await User.updateOne({_id: id}, {
+            $set: updateUserData,
+        });
+
+        return res.status(200).json(updatedData);
+    } catch (error) {
+        next(error);
+    }
+}
+
+
+
+// deleteUserById user
+const deleteUserById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        await User.deleteOne({
+            _id: id
+        });
+
+        return res.status(200).json({
+            message:"User Deleted Successfully.."
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = {
+    getAllUsers,
+    getAllContacts,
+    deleteUserById,
+    getUserById,
+    updateUserById
+};

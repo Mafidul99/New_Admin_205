@@ -14,6 +14,7 @@ import AppLayout from './partials/AppLayout';
 import Dashboard from './pages/Admin/Dashboard';
 import UserList from './pages/Admin/View/Users/UserList';
 import AddNew from './pages/Admin/View/Users/AddNew';
+import UserEdit from './pages/Admin/View/Users/UserEdit';
 
 function App() {
 
@@ -38,7 +39,8 @@ function App() {
         {/* //Admin Routes */}
         <Route path='/admin' element={<AppLayout />}> 
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="user-list" element={<UserList />} />
+          <Route path="users" element={<UserList />} />
+          <Route path="users/edit/:id" element={<UserEdit />} />
           <Route path="add-new" element={<AddNew />} />
         </Route>
       </Routes>

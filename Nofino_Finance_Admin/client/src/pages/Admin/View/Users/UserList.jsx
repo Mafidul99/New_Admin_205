@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../../../store/auth';
 
 
-import { NavLink } from 'react-router-dom';
-import { FaRegEdit } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaPlus } from "react-icons/fa6";
+import { FaRegEdit } from "react-icons/fa";
 
 
 // ✅ Import extensions
@@ -21,7 +21,7 @@ import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import 'datatables.net-select-dt';
 import 'datatables.net-responsive-dt';
-import Modal from '../../../../components/ui/Modal';
+// import UserModal from './UserModal';
 // import UserModal from './UserModal';
 
 DataTable.use(DT, pdfMake);
@@ -30,58 +30,8 @@ DataTable.use(DT, pdfMake);
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
-  const { AuthorizationToken, storeTokenInLs } = useAuth();
+  const { AuthorizationToken } = useAuth();
   const [search, setSearch] = useState("");
-
-  const [user, setUser] = useState({
-    username: "", phone: "", email: "", password: ""
-  });
-   
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
-  };
-
-  const URL = `${import.meta.env.VITE_API_URL}/api/auth/register`;
-
-  const handleUserSubmit = async (e) => {
-    e.preventDefault();
-    // console.log(user);
-    try {
-      const response = await fetch(URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-      // console.log(response);
-
-      const res_data = await response.json();
-      if (response.ok) {
-        // storetoken(data.token);
-        storeTokenInLs(res_data.token);
-        toast.success("Registration successful Done", res_data.extraDetails);
-        setUser({ username: "", phone: "", email: "", password: "" });
-        
-      } else {
-        toast.error(res_data.extraDetails ? res_data.extraDetails : res_data.message);
-        
-      }
-    } catch (error) {
-      console.error("register:", error);
-    }
-  };
-
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
 
   const getAllUsersData = async () => {
 
@@ -119,6 +69,32 @@ const UserList = () => {
   );
 
 
+  // user delete data
+  const deleteUser = async (id) => {
+    const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/delete/${id}`;
+
+    try {
+      const response = await fetch(URL, {
+        method: 'DELETE',
+        headers: {
+          Authorization: AuthorizationToken,
+        },
+      });
+      const data = await response.json();
+      console.log(`Users after Delete: ${data}`);
+
+      if(response.ok){
+        getAllUsersData();
+      }
+      
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+
+    }
+    
+  }
+
+
   return (
     <>
       <div className="grow">
@@ -134,13 +110,12 @@ const UserList = () => {
             {/* Right: Actions */}
             <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-3 items-center">
               {/* UserModal */}
-              <button
-                onClick={openModal}
+              <Link to={"/admin/add-new"}                
                 className="btn bg-green-700 text-gray-100 hover:bg-green-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
               >
                 <FaPlus size={16} className='inline-block mr-2' />
                 Add New
-              </button>
+              </Link>
             </div>
           </div>
 
@@ -188,11 +163,14 @@ const UserList = () => {
                           </td>
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center item-center">
-                              <button className="w-4 mr-2 text-green-500 transform hover:text-blue-500 hover:scale-110">
-                                <FaRegEdit />
-                              </button>
-                              <button className="w-4 mr-2 text-red-500 transform hover:text-red-500 hover:scale-110">
-                                <RiDeleteBin6Line />
+                              {/* <UserModal/> */}
+                              <Link to={`/admin/users/edit/${row._id}`}
+                                className="w-4 mr-2 text-green-500 transform hover:text-green-700 hover:scale-110">
+                                <FaRegEdit className='w-4.5 h-4.5'/>
+                              </Link>
+                              <button onClick={() => deleteUser(row._id)}
+                                className="w-4 mr-2 text-red-500 transform hover:text-red-700 hover:scale-110">
+                                <RiDeleteBin6Line className='w-4.5 h-4.5'/>
                               </button>
                             </div>
                           </td>
@@ -212,60 +190,7 @@ const UserList = () => {
           </div>
         </div>
       </div>
-
-
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Modal isOpen={isModalOpen} onClose={closeModal} title="Add Users">
-          {/* <h2 className="text-2xl font-bold mb-4">Users</h2> */}
-          <form className="space-y-4" onSubmit={handleUserSubmit}>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-              <div className="mt-1">
-                <input type="text" name='username' id='username' placeholder='Username' required
-                  value={user.username} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone number</label>
-              <div className="mt-1">
-                <input type="number" name='phone' id='phone' placeholder='Phone number' required
-                  value={user.phone} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
-              <div className="mt-1">
-                <input type="email" name='email' id='email' placeholder='Email address' required
-                  value={user.email} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-              <div className="mt-1">
-                <input type="password" name='password' id='password' placeholder='Password' required
-                  value={user.password} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <button type="submit"
-                className="justify-center px-4 py-2 text-sm font-medium text-white bg-green-800 border border-transparent rounded-md group hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-50">
-                Add New
-              </button>
-              <button
-                onClick={closeModal}
-                className="ml-3 mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                Close
-              </button>
-            </div>
-          </form>
-
-        </Modal>
-      </div>
+     
     </>
   )
 }
