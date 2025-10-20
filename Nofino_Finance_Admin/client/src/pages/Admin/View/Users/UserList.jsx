@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../../../store/auth';
 
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaPlus } from "react-icons/fa6";
 import { FaRegEdit } from "react-icons/fa";
@@ -27,6 +27,8 @@ DataTable.use(DT, pdfMake);
 
 
 const UserList = () => {
+
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const { AuthorizationToken } = useAuth();
   const [editUser, setEditUser] = useState(null);
