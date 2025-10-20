@@ -15,6 +15,9 @@ import Dashboard from './pages/Admin/Dashboard';
 import UserList from './pages/Admin/View/Users/UserList';
 import AddNew from './pages/Admin/View/Users/AddNew';
 import UserEdit from './pages/Admin/View/Users/UserEdit';
+import UserProfile from './pages/Admin/View/Users/UserProfile';
+import UserContact from './pages/Admin/View/Contact/UserContact';
+import NewMessage from './pages/Admin/View/Contact/NewMessage';
 
 function App() {
 
@@ -42,6 +45,9 @@ function App() {
           <Route path="users" element={<UserList />} />
           <Route path="users/edit/:id" element={<UserEdit />} />
           <Route path="add-new" element={<AddNew />} />
+          <Route path="user-profile" element={<UserProfile />} />
+          <Route path="user-contact" element={<UserContact />} />
+          <Route path="new-message" element={<NewMessage />} />
         </Route>
       </Routes>
     </>
