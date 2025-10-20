@@ -9,7 +9,7 @@ import { useParams } from 'react-router-dom';
 const UserModal = () => {
     const [open, setOpen] = useState(false)
     const { AuthorizationToken } = useAuth();
-    const { id } = useParams();
+    const params = useParams();
 
 
 
@@ -24,7 +24,7 @@ const UserModal = () => {
 
     const handleUserSubmit = async (e) => {
         e.preventDefault();
-        const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/update/${id}`;
+        const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/update/${params._id}`;
         try {
             const response = await fetch(URL, {
                 method: 'PATCH',
@@ -34,6 +34,7 @@ const UserModal = () => {
                 },
                 body: JSON.stringify(data),
             });
+             getAllUsersData();
 
             if (response.ok) {
                 toast.success("Updated Successfully..");
@@ -49,7 +50,7 @@ const UserModal = () => {
 
 
     const getAllUsersData = async () => {
-        const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/${id}`;
+        const URL = `${import.meta.env.VITE_API_URL}/api/admin/users`;
         try {
             const response = await fetch(URL, {
                 method: 'GET',
@@ -71,7 +72,7 @@ const UserModal = () => {
     useEffect(() => {
         getAllUsersData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+    }, []);
 
     return (
         <>
@@ -80,7 +81,7 @@ const UserModal = () => {
                 className="w-4 mr-2 text-green-500 transform hover:text-green-700 hover:scale-110">
                 <FaRegEdit className='w-4.5 h-4.5' />
             </button>
-            <Dialog open={open} onClose={setOpen} className="relative z-10">
+            <Dialog open={open} onClose={setOpen} className="relative z-50">
                 <DialogBackdrop transition
                     className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
                 />

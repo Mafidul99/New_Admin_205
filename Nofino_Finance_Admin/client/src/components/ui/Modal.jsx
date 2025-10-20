@@ -1,7 +1,9 @@
 import React from "react";
 import { IoClose } from "react-icons/io5";
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, user, onUpdate }) {
+
+
   if (!isOpen) return null;
 
   return (

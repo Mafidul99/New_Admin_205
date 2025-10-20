@@ -21,8 +21,6 @@ import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import 'datatables.net-select-dt';
 import 'datatables.net-responsive-dt';
-// import UserModal from './UserModal';
-// import UserModal from './UserModal';
 
 DataTable.use(DT, pdfMake);
 
@@ -31,8 +29,12 @@ DataTable.use(DT, pdfMake);
 const UserList = () => {
   const [users, setUsers] = useState([]);
   const { AuthorizationToken } = useAuth();
-  const [search, setSearch] = useState("");
+  const [editUser, setEditUser] = useState(null);
+  const [formData, setFormData] = useState({ username: "", email: "", phone: "" });
 
+
+
+// get all user data
   const getAllUsersData = async () => {
 
     const URL = `${import.meta.env.VITE_API_URL}/api/admin/users`;
@@ -47,28 +49,50 @@ const UserList = () => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      // console.log(data);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching user data:', error);
 
     }
   };
-
   useEffect(() => {
     getAllUsersData();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.username.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.phone.toLowerCase().includes(search.toLowerCase())
-  );
 
+  const handleEdit = (user) => {
+    setEditUser(user);
+    setFormData(user);
+  };
 
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/update/${editUser._id}`;
+      const response = await fetch(URL, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: AuthorizationToken,
+        },
+        body: JSON.stringify(formData),
+      });
+      setEditUser(null);
+      getAllUsersData();
+      if (response.ok) {
+        toast.success("User updated successfully!");
+        navigate("/admin/users");
+      } else {
+        toast.error("Update failed!.. plc try");
+      }
+
+    } catch (error) {
+      console.error("Update error:", error);
+    }
+  };
+
+  
   // user delete data
   const deleteUser = async (id) => {
     const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/delete/${id}`;
@@ -83,16 +107,16 @@ const UserList = () => {
       const data = await response.json();
       console.log(`Users after Delete: ${data}`);
 
-      if(response.ok){
+      if (response.ok) {
         getAllUsersData();
       }
-      
+
     } catch (error) {
       console.error('Error fetching user data:', error);
 
     }
-    
-  }
+
+  };
 
 
   return (
@@ -110,7 +134,7 @@ const UserList = () => {
             {/* Right: Actions */}
             <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-3 items-center">
               {/* UserModal */}
-              <Link to={"/admin/add-new"}                
+              <Link to={"/admin/add-new"}
                 className="btn bg-green-700 text-gray-100 hover:bg-green-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
               >
                 <FaPlus size={16} className='inline-block mr-2' />
@@ -123,7 +147,7 @@ const UserList = () => {
           <div className="grid grid-cols-1 gap-2">
             <div className="container">
               <div className="overflow-x-auto bg-white rounded-lg shadow px-4 py-4">
-                {filteredUsers.length > 0 ? (
+                {users.length > 0 ? (
                   <DataTable className="w-full table-auto display border-[1px] my-2"
                     options={{
                       responsive: true,
@@ -150,11 +174,11 @@ const UserList = () => {
                       </tr>
                     </thead>
                     <tbody className="text-sm text-gray-600">
-                      {filteredUsers.map((row, index) => (
-                        <tr key={index} className="border-b hover:bg-indigo-50 transition border-gray-200">
-                          <td className="px-6 py-3 text-left">{row.username}</td>
-                          <td className="px-6 py-3 text-left">{row.email}</td>
-                          <td className="px-6 py-3 text-left">{row.phone}</td>
+                      {users.map((user) => (
+                        <tr key={user._id} className="border-b hover:bg-indigo-50 transition border-gray-200">
+                          <td className="px-6 py-3 text-left">{user.username}</td>
+                          <td className="px-6 py-3 text-left">{user.email}</td>
+                          <td className="px-6 py-3 text-left">{user.phone}</td>
                           <td className="px-6 py-3 text-left">Admin</td>
                           <td className="px-6 py-3 text-left">
                             <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
@@ -163,14 +187,14 @@ const UserList = () => {
                           </td>
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center item-center">
-                              {/* <UserModal/> */}
-                              <Link to={`/admin/users/edit/${row._id}`}
+                              <button
+                                onClick={() => handleEdit(user)}
                                 className="w-4 mr-2 text-green-500 transform hover:text-green-700 hover:scale-110">
-                                <FaRegEdit className='w-4.5 h-4.5'/>
-                              </Link>
-                              <button onClick={() => deleteUser(row._id)}
+                                <FaRegEdit className='w-4.5 h-4.5' />
+                              </button>
+                              <button onClick={() => deleteUser(user)}
                                 className="w-4 mr-2 text-red-500 transform hover:text-red-700 hover:scale-110">
-                                <RiDeleteBin6Line className='w-4.5 h-4.5'/>
+                                <RiDeleteBin6Line className='w-4.5 h-4.5' />
                               </button>
                             </div>
                           </td>
@@ -190,7 +214,67 @@ const UserList = () => {
           </div>
         </div>
       </div>
-     
+
+      {/* Modal */}
+      {editUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500/75 z-50">
+          <div transition className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95" >
+            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h2 className="text-xl font-semibold mb-4">Edit User</h2>
+              <form onSubmit={handleUpdate}>
+                <label className="block mb-2 font-medium">Name</label>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                  className="border w-full p-2 rounded mb-3"
+                  required
+                />
+
+                <label className="block mb-2 font-medium">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="border w-full p-2 rounded mb-3"
+                  required
+                />
+
+                <label className="block mb-2 font-medium">Phone</label>
+                <input
+                  type="number"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  className="border w-full p-2 rounded mb-4"
+                  required
+                />
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="submit"
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+                  >
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditUser(null)}
+                    className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+                  >
+                    Cancel
+                  </button>                  
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
