@@ -7,6 +7,20 @@ import { useNavigate } from 'react-router-dom';
 import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
+// ✅ Import extensions
+import "datatables.net-buttons/js/dataTables.buttons";
+import "datatables.net-buttons-dt/css/buttons.dataTables.css";
+import "datatables.net-buttons/js/buttons.html5";
+import "datatables.net-buttons/js/buttons.print";
+import "datatables.net-responsive-dt/css/responsive.dataTables.css";
+import pdfMake from "pdfmake/build/pdfmake";
+import DataTable from 'datatables.net-react';
+import DT from 'datatables.net-dt';
+import 'datatables.net-select-dt';
+import 'datatables.net-responsive-dt';
+
+DataTable.use(DT, pdfMake);
+
 
 const defaultContactForm = {
     username: "",
@@ -17,8 +31,11 @@ const defaultContactForm = {
 const UserContact = () => {
     const navigate = useNavigate();
     const { AuthorizationToken, user } = useAuth();
+
+    const [contactUserData, setContactUserData] = useState([]);
     const [contact, setContact] = useState(defaultContactForm);
 
+    const [userData, setUserData] = useState(true);
 
     const handleInput = (e) => {
         const { name, value } = e.target;
@@ -28,7 +45,6 @@ const UserContact = () => {
         });
     };
 
-    const [userData, setUserData] = useState(true);
 
     if (userData && user) {
         setContact({
@@ -57,7 +73,7 @@ const UserContact = () => {
                 console.log(res_data);
                 toast.success("Message Send Successfully");
                 setContact(defaultContactForm);
-                navigate("/admin/user-contact");
+                navigate(0);
             } else {
                 toast.error("Message Not Send");
             }
@@ -68,24 +84,20 @@ const UserContact = () => {
         }
     };
 
-    const [contactUserData, setContactUserData] = useState([]);
 
     const getContactsData = async () => {
         const URL = `${import.meta.env.VITE_API_URL}/api/admin/contacts`;
         try {
             const response = await fetch(URL, {
-                method: 'GET',
+                method: "GET",
                 headers: {
                     Authorization: AuthorizationToken,
-                },                
-            });            
+                },
+            });
 
             const res_data = await response.json();
-            // console.log("Contact Data", res_data);
             if (response.ok) {
-                // console.log(response);
                 setContactUserData(res_data);
-                toast.success("Data Loaded successfully!");
             } else {
                 toast.error("Data Not Show ..!");
             }
@@ -93,11 +105,42 @@ const UserContact = () => {
         } catch (error) {
             console.log(error);
         }
+    };
+
+
+
+    // user delete data
+  const deleteContact = async (id) => {
+    const URL = `${import.meta.env.VITE_API_URL}/api/admin/contacts/delete/${id}`;    
+    try {
+      const response = await fetch(URL, {
+        method: 'DELETE',
+        headers: {
+          Authorization: AuthorizationToken,
+        },
+      });
+    //   const data = await response.json();
+    //   console.log(`Users after Delete: ${data}`);
+      if (response.ok) {
+        toast.success("Message Deleted Successfully");
+        getContactsData();
+        // navigate(0);
+      }else{
+        toast.error("Message Not Deleted");
+      }
+
+    } catch (error) {
+      console.error('Error fetching user data:', error);
     }
+  };
+
 
     useEffect(() => {
         getContactsData();
     }, []);
+
+
+    
 
 
     return (
@@ -154,21 +197,34 @@ const UserContact = () => {
                         <div className="container">
                             <div className="overflow-x-auto bg-white rounded-lg shadow-md px-4 py-4 dark:bg-gray-700 dark:text-white">
                                 {contactUserData.length > 0 ? (
-                                    <table className="w-full table-auto display border-[1px] my-3">
+                                    <DataTable className="table-fixed rounded w-full m-auto "
+                                        options={{
+                                            responsive: true,
+                                            pagination: true,
+                                            searching: true,
+                                            layout: {
+                                                top2Start: 'buttons',
+                                            },
+                                            buttons: ['csv', 'excel', 'pdf', 'print'],
+                                            pageLength: 10,
+                                            lengthMenu: [10, 25, 50, 100],
+
+                                        }}
+                                    >
                                         <thead>
                                             <tr className="text-sm text-gray-600 uppercase bg-green-200 items-center justify-center justify-items-center">
-                                                <th className="px-6 py-3">Name</th>
-                                                <th className="px-6 py-3">Email</th>
-                                                <th className="px-6 py-3">Message</th>
-                                                <th className="px-6 py-3">Actions</th>
+                                                <th className="px-6 py-3 text-center">User Name</th>
+                                                <th className="px-6 py-3 text-center">User Email</th>
+                                                <th className="px-6 py-3 text-center">Message</th>
+                                                <th className="px-6 py-3 text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody className="text-sm text-gray-600 dark:text-white">
                                             {contactUserData.map((curCont) => (
-                                                <tr key={curCont._id} className="border hover:bg-indigo-50 transition border-gray-200 dark:border-gray-100">
-                                                    <td className="px-6 py-3">{curCont.username}</td>
+                                                <tr key={curCont._id} className="border-[1px] hover:bg-indigo-50 transition border-gray-200 dark:border-gray-100">
+                                                    <td className="px-6 py-3 text-left">{curCont.username}</td>
                                                     <td className="px-6 py-3">{curCont.email}</td>
-                                                    <td className="px-6 py-3">{curCont.message}</td>
+                                                    <td className="px-6 py-3 text-wrap">{curCont.message}</td>
                                                     <td className="px-6 py-3 text-center">
                                                         <div className="flex justify-center item-center">
                                                             <button
@@ -176,8 +232,7 @@ const UserContact = () => {
                                                                 className="w-4 mr-2 text-green-500 transform hover:text-green-700 hover:scale-110">
                                                                 <FaRegEdit className='w-4.5 h-4.5' />
                                                             </button>
-                                                            <button
-                                                                // onClick={() => deleteUser(user._id)}
+                                                            <button onClick={() => deleteContact(curCont._id)}
                                                                 className="w-4 mr-2 text-red-500 transform hover:text-red-700 hover:scale-110">
                                                                 <RiDeleteBin6Line className='w-4.5 h-4.5' />
                                                             </button>
@@ -186,7 +241,7 @@ const UserContact = () => {
                                                 </tr>
                                             ))}
                                         </tbody>
-                                    </table>
+                                    </DataTable>
                                 ) : (
                                     <span className="py-4 text-center text-gray-600 italic font-bold" >
                                         No users found
@@ -201,4 +256,4 @@ const UserContact = () => {
     )
 }
 
-export default UserContact
+export default UserContact;

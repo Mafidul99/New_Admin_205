@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaPlus } from "react-icons/fa6";
 import { FaRegEdit } from "react-icons/fa";
+import { toast } from 'react-toastify';
 
 
 // ✅ Import extensions
@@ -14,9 +15,7 @@ import "datatables.net-buttons-dt/css/buttons.dataTables.css";
 import "datatables.net-buttons/js/buttons.html5";
 import "datatables.net-buttons/js/buttons.print";
 import "datatables.net-responsive-dt/css/responsive.dataTables.css";
-import { toast } from 'react-toastify';
 import pdfMake from "pdfmake/build/pdfmake";
-
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import 'datatables.net-select-dt';
@@ -167,20 +166,20 @@ const UserList = () => {
                   >
                     <thead>
                       <tr className="text-sm text-gray-600 uppercase bg-green-200 items-center justify-center justify-items-center">
-                        <th className="px-6 py-3">Name</th>
-                        <th className="px-6 py-3">Email</th>
-                        <th className="px-6 py-3">Phone</th>
+                        <th className="px-6 py-3 items-start">Name</th>
+                        <th className="px-6 py-3 items-start">Email</th>
+                        <th className="px-6 py-3 items-start">Phone</th>
                         <th className="px-6 py-3">Role</th>
                         <th className="px-6 py-3">Status</th>
                         <th className="px-6 py-3">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="text-sm text-gray-600 dark:text-white">
+                    <tbody className="text-sm text-gray-600 dark:text-white items-start">
                       {users.map((user) => (
                         <tr key={user._id} className="border hover:bg-indigo-50 transition border-gray-200 dark:border-gray-100">
-                          <td className="px-6 py-3">{user.username}</td>
-                          <td className="px-6 py-3">{user.email}</td>
-                          <td className="px-6 py-3">{user.phone}</td>
+                          <td className="px-6 py-3 items-start">{user.username}</td>
+                          <td className="px-6 py-3 items-start">{user.email}</td>
+                          <td className="px-6 py-3 items-start">{user.phone}</td>
                           <td className="px-6 py-3">Admin</td>
                           <td className="px-6 py-3">
                             <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">

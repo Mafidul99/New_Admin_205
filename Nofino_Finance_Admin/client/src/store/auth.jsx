@@ -9,6 +9,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem("token"));
     const [user, setUser] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     const AuthorizationToken = `Bearer ${token}`;
     // storing token in local storage
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     const URL = `${import.meta.env.VITE_API_URL}/api/auth/user`;
     const userAuthentication = async () => {
         try {
+            setIsLoading(true);
             const response = await fetch(URL, {
                 method: "GET",
                 headers: {
@@ -37,8 +39,11 @@ export const AuthProvider = ({ children }) => {
             if(response.ok){
                 const data = await response.json();
                 setUser(data.userData);
-            };
-
+                setIsLoading(false);
+            }else{
+                console.error("Error Fetching user Data");
+                setIsLoading(false);
+            }
         // eslint-disable-next-line no-unused-vars
         } catch (error) {
             console.error("Error Fetching user Data");
@@ -53,7 +58,7 @@ export const AuthProvider = ({ children }) => {
 
 
     return (
-        <AuthContext.Provider value={{ storeTokenInLs, LogoutUser, token, user, AuthorizationToken }}>
+        <AuthContext.Provider value={{ storeTokenInLs, LogoutUser, token, user, AuthorizationToken, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
