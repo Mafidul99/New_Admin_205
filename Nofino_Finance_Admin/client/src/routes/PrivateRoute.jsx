@@ -1,25 +1,12 @@
-import React, { useState } from 'react'
-import Header from './Header'
-import Sidebar from './Sidebar'
-import { Outlet } from 'react-router-dom'
-// import { useAuth } from '../store/auth'
-// import Loader from '../components/ui/Loader'
+import React, { useState } from "react"
+import { Outlet } from "react-router-dom"
+import Sidebar from "../partials/Sidebar";
+import Header from "../partials/Header";
 
-const AdminAppLayout = () => {
+const PrivateRoute = ({ allowedRoles }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // const {user, isLoading} = useAuth();
-
-  // if(isLoading){
-  //   return <Loader/>;
-  // }
-
-  // if(!user.isAdmin){
-  //   return <Navigate to="/admin/dashboard"/>;
-  // }
-
-
   return (
+
     <>
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
@@ -35,9 +22,8 @@ const AdminAppLayout = () => {
           </main>
         </div>
       </div>
-
     </>
   )
 }
 
-export default AdminAppLayout
+export default PrivateRoute;

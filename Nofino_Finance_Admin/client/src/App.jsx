@@ -6,11 +6,6 @@ import './css/style.css';
 import './charts/ChartjsConfig';
 
 // Import pages
-import AdminLogin from './pages/Admin/Auth/AdminLogin';
-import AdminRegister from './pages/Admin/Auth/AdminRegister';
-import ForgotPassword from './pages/Admin/Auth/ForgotPassword';
-import { Logout } from './pages/Admin/Auth/Logout';
-import Dashboard from './pages/Admin/Dashboard';
 import UserList from './pages/Admin/View/Users/UserList';
 import AddNew from './pages/Admin/View/Users/AddNew';
 import UserEdit from './pages/Admin/View/Users/UserEdit';
@@ -18,8 +13,14 @@ import UserProfile from './pages/Admin/View/Users/UserProfile';
 import UserContact from './pages/Admin/View/Contact/UserContact';
 import NewMessage from './pages/Admin/View/Contact/NewMessage';
 import UserDashboard from './pages/User/UserDashboard';
-import AdminAppLayout from './partials/AdminAppLayout';
-import UserAppLayout from './partials/UserAppLayout';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import PrivateRoute from './routes/PrivateRoute';
+import { useAuth } from './store/auth';
+import Loader from './components/ui/Loader';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import { Logout } from './pages/Auth/Logout';
+import AdminDashboard from './pages/Admin/AdminDashboard';
 
 function App() {
 
@@ -35,20 +36,21 @@ function App() {
     <>
       <Routes>
         {/* //user Routes */}
-        <Route path='/' element={<AdminLogin />} />
-        <Route path='/register' element={<AdminRegister />} />
+        <Route path='/login' element={< Login/>} />
+        <Route path='/register' element={< Register/>} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/logout' element={<Logout />} />
         {/* <Route path="/dashboard" element={<Dashboard />} /> */}
 
         {/* //user Routes */}
-        <Route element={<UserAppLayout />}>
-          <Route index path="/dashboard" element={<UserDashboard />} />
-        </Route>
+        <Route path="/user"element={<PrivateRoute allowedRoles={["user"]} />}>
+          <Route path="dashboard" element={<UserDashboard />} />
+        </Route>        
 
         {/* //Admin Routes */}
-        <Route path='/admin' element={<AdminAppLayout />}>
-          <Route path="dashboard" element={<Dashboard />} />
+         {/* <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} /> */}
+        <Route path='/admin' element={<PrivateRoute allowedRoles={["admin"]} />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
           <Route path="users/edit/:id" element={<UserEdit />} />
           <Route path="add-new" element={<AddNew />} />
@@ -56,9 +58,32 @@ function App() {
           <Route path="contact" element={<UserContact />} />
           <Route path="new-message" element={<NewMessage />} />
         </Route>
+
+
+
+        {/* Default Route */}
+          <Route path="/" element={<Root />} />
       </Routes>
     </>
   );
 }
 
 export default App;
+
+const Root = () => {
+  const {user, isLoading} = useAuth();
+
+  if(isLoading){
+    return <Loader/>;
+  }  
+
+  if (!user) {
+    return <Navigate to={"/login"} />
+  }
+
+  return user.role === "admin" ? (
+    <Navigate to={"/admin/dashboard"} />
+  ) : (
+    <Navigate to={"/user/dashboard"} />
+  )
+}

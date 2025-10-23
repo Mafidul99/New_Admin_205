@@ -129,7 +129,7 @@ function Sidebar({
                         onClick={(e) => {
                           e.preventDefault();
                           handleClick();
-                          setSidebarExpanded(true);
+                          // setSidebarExpanded(true);
                         }}
                       >
                         <div className="flex items-center justify-between">
@@ -204,7 +204,7 @@ function Sidebar({
                         onClick={(e) => {
                           e.preventDefault();
                           handleClick();
-                          setSidebarExpanded(true);
+                          // setSidebarExpanded(true);
                         }}
                       >
                         <div className="flex items-center justify-between">
@@ -293,7 +293,7 @@ function Sidebar({
                         onClick={(e) => {
                           e.preventDefault();
                           handleClick();
-                          setSidebarExpanded(true);
+                          // setSidebarExpanded(true);
                         }}
                       >
                         <div className="flex items-center justify-between">
@@ -381,7 +381,7 @@ function Sidebar({
                         onClick={(e) => {
                           e.preventDefault();
                           handleClick();
-                          setSidebarExpanded(true);
+                          // setSidebarExpanded(true);
                         }}
                       >
                         <div className="flex items-center justify-between">
@@ -456,7 +456,7 @@ function Sidebar({
                         onClick={(e) => {
                           e.preventDefault();
                           handleClick();
-                          setSidebarExpanded(true);
+                          // setSidebarExpanded(true);
                         }}
                       >
                         <div className="flex items-center justify-between">
@@ -534,7 +534,7 @@ function Sidebar({
                         onClick={(e) => {
                           e.preventDefault();
                           handleClick();
-                          setSidebarExpanded(true);
+                          // setSidebarExpanded(true);
                         }}
                       >
                         <div className="flex items-center justify-between">

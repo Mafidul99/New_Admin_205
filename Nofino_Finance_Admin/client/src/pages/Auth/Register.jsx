@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../store/auth';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../store/auth';
 
-const AdminRegister = () => {
+const Register = () => {
     const navigate = useNavigate();
     const {storeTokenInLs} = useAuth();
 
@@ -108,4 +108,4 @@ const AdminRegister = () => {
     )
 }
 
-export default AdminRegister
+export default Register

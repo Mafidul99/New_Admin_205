@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         require: true,
+        unique: true,
     },
     phone: {
         type: String,
@@ -19,11 +20,20 @@ const userSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
-    isAdmin: {
-        type: Boolean,
-        default: false,
+    profileImgUrl:{
+        type: String,
+        default: "https://cdn-icons-png.flaticon.com/512/219/219983.png",
+    },
+    role: {
+        type: String,
+        enum: [
+            "admin", "user"
+        ],
+        default: "user",
     }
-});
+},
+{timestamps: true}
+);
 
 userSchema.pre('save', async function (next) {
     const user = this;
@@ -54,11 +64,11 @@ userSchema.methods.generateToken = async function () {
         return jwt.sign({
                 userId: this._id.toString(),
                 email: this.email,
-                isAdmin: this.isAdmin,
+                role: this.role,
             },
             process.env.JWT_SECRET_KEY, 
             {
-                expiresIn: "30d",
+                expiresIn: "1d",
             }
         );
     } catch (error) {
