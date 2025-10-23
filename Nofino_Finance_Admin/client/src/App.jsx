@@ -17,7 +17,7 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import PrivateRoute from './routes/PrivateRoute';
 import { useAuth } from './store/auth';
-import Loader from './components/ui/Loader';
+// import Loader from './components/ui/Loader';
 import ForgotPassword from './pages/Auth/ForgotPassword';
 import { Logout } from './pages/Auth/Logout';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -36,20 +36,13 @@ function App() {
     <>
       <Routes>
         {/* //user Routes */}
-        <Route path='/login' element={< Login/>} />
-        <Route path='/register' element={< Register/>} />
+        <Route path='/login' element={< Login />} />
+        <Route path='/register' element={< Register />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/logout' element={<Logout />} />
-        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
 
-        {/* //user Routes */}
-        <Route path="/user"element={<PrivateRoute allowedRoles={["user"]} />}>
-          <Route path="dashboard" element={<UserDashboard />} />
-        </Route>        
-
-        {/* //Admin Routes */}
-         {/* <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} /> */}
-        <Route path='/admin' element={<PrivateRoute allowedRoles={["admin"]} />}>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<PrivateRoute allowedRoles={["admin"]} />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<UserList />} />
           <Route path="users/edit/:id" element={<UserEdit />} />
@@ -59,10 +52,13 @@ function App() {
           <Route path="new-message" element={<NewMessage />} />
         </Route>
 
-
+        {/* User Routes */}
+        <Route path="/user" element={<PrivateRoute allowedRoles={["user"]} />}>
+          <Route path="dashboard" element={<UserDashboard />} />
+        </Route>
 
         {/* Default Route */}
-          <Route path="/" element={<Root />} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </>
   );
@@ -70,13 +66,10 @@ function App() {
 
 export default App;
 
-const Root = () => {
-  const {user, isLoading} = useAuth();
+const Home = () => {
+  const { user } = useAuth((state) => state.user);
 
-  if(isLoading){
-    return <Loader/>;
-  }  
-
+  
   if (!user) {
     return <Navigate to={"/login"} />
   }

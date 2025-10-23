@@ -9,5 +9,5 @@ import { useAuth } from "../../store/auth";
             LogoutUser();
         },[LogoutUser]);
 
-        return <Navigate to="/"/>
+        return <Navigate to="/login"/>
     };

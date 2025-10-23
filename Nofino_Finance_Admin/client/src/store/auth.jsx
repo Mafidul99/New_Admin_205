@@ -26,11 +26,11 @@ export const AuthProvider = ({ children }) => {
     };
 
     //jwt auth datan andfact\
-    const URL = `${import.meta.env.VITE_API_URL}/api/auth/user`;
+    // const URL = `${import.meta.env.VITE_API_URL}/api/auth/user`;
     const userAuthentication = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(URL, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/user`, {
                 method: "GET",
                 headers: {
                     Authorization: AuthorizationToken

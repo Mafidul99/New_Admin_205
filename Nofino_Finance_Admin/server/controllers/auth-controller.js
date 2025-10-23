@@ -25,7 +25,7 @@ const register = async (req, res) => {
             role
         } = req.body;
 
-        if(!name || !email || !phone || !password || name === "" || email === "" || password == ""){            
+        if(!username || !email || !phone || !password || username === "" || email === "" || password == ""){            
              return res.status(400).json({
                 message: "All fields are required "
             });
