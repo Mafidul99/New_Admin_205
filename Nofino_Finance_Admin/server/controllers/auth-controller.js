@@ -20,8 +20,16 @@ const register = async (req, res) => {
             username,
             email,
             phone,
-            password
+            password,
+            profileImgUrl,
+            role
         } = req.body;
+
+        if(!username || !email || !phone || !password || username === "" || email === "" || password == ""){            
+             return res.status(400).json({
+                message: "All fields are required "
+            });
+        };
 
         const userExist = await User.findOne({
             email
@@ -33,6 +41,16 @@ const register = async (req, res) => {
             })
         }
 
+        const userExistPhone = await User.findOne({
+            phone
+        });
+
+        if (userExistPhone) {
+             return res.status(400).json({
+                message: "Phone alredy Exists !..."
+            })
+        }
+
         // hash password
         // const saltRound = 10;
         // const hash_password = await bcrypt.hash(password, saltRound);
@@ -41,7 +59,9 @@ const register = async (req, res) => {
             username,
             email,
             phone,
-            password
+            password,
+            profileImgUrl,
+            role
         });
 
         res.status(201).json({
@@ -63,6 +83,12 @@ const login = async (req, res) => {
             password
         } = req.body;
 
+        if(!email || !password || email === "" || password == ""){            
+             return res.status(400).json({
+                message: "All fields are required "
+            });
+        };
+
         const userExist = await User.findOne({
             email
         });
@@ -81,6 +107,7 @@ const login = async (req, res) => {
                 message: "Login Successfully Done..",
                 token: await userExist.generateToken(),
                 userId: userExist._id.toString(),
+                role: userExist.role,
             });
         }else{
             res.status(401).json({msg: "Invalid Email or Password.."})

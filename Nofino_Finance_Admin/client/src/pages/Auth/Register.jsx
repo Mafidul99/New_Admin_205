@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../store/auth';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../store/auth';
 
-const AdminRegister = () => {
+const Register = () => {
     const navigate = useNavigate();
     const {storeTokenInLs} = useAuth();
 
     const [user, setUser] = useState({
-        username: "", phone: "", email: "", password: ""
+        username: "", phone: "", email: "", password: "", profileImgUrl: ""
     });
 
     const handleChange = (e) => {
@@ -19,13 +19,13 @@ const AdminRegister = () => {
         });
     };
 
-    const URL = `${import.meta.env.VITE_API_URL}/api/auth/register`;    
+    // const URL = `${import.meta.env.VITE_API_URL}/api/auth/register`;    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         // console.log(user);
         try {
-            const response = await fetch(URL, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -39,8 +39,8 @@ const AdminRegister = () => {
                 // storetoken(data.token);
                 storeTokenInLs(res_data.token);
                 toast.success("Registration successful Done", res_data.extraDetails);
-                setUser({ username: "", phone: "", email: "", password: "" });
-                navigate("/");
+                setUser({ username: "", phone: "", email: "", password: "", profileImgUrl: ""});
+                navigate("/login");
             } else {
                 toast.error(res_data.extraDetails ? res_data.extraDetails : res_data.message);
                 navigate("/register");
@@ -108,4 +108,4 @@ const AdminRegister = () => {
     )
 }
 
-export default AdminRegister
+export default Register

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useAuth } from '../../../../store/auth';
 
 
-import { NavLink } from 'react-router-dom';
-import { FaRegEdit } from "react-icons/fa";
+import { Link, useNavigate } from 'react-router-dom';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { FaPlus } from "react-icons/fa6";
+import { FaRegEdit } from "react-icons/fa";
+import { toast } from 'react-toastify';
 
 
 // ✅ Import extensions
@@ -14,75 +15,27 @@ import "datatables.net-buttons-dt/css/buttons.dataTables.css";
 import "datatables.net-buttons/js/buttons.html5";
 import "datatables.net-buttons/js/buttons.print";
 import "datatables.net-responsive-dt/css/responsive.dataTables.css";
-import { toast } from 'react-toastify';
 import pdfMake from "pdfmake/build/pdfmake";
-
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import 'datatables.net-select-dt';
 import 'datatables.net-responsive-dt';
-import Modal from '../../../../components/ui/Modal';
-// import UserModal from './UserModal';
 
 DataTable.use(DT, pdfMake);
 
 
 
 const UserList = () => {
+
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
-  const { AuthorizationToken, storeTokenInLs } = useAuth();
-  const [search, setSearch] = useState("");
-
-  const [user, setUser] = useState({
-    username: "", phone: "", email: "", password: ""
-  });
-   
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser({
-      ...user,
-      [name]: value,
-    });
-  };
-
-  const URL = `${import.meta.env.VITE_API_URL}/api/auth/register`;
-
-  const handleUserSubmit = async (e) => {
-    e.preventDefault();
-    // console.log(user);
-    try {
-      const response = await fetch(URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(user),
-      });
-      // console.log(response);
-
-      const res_data = await response.json();
-      if (response.ok) {
-        // storetoken(data.token);
-        storeTokenInLs(res_data.token);
-        toast.success("Registration successful Done", res_data.extraDetails);
-        setUser({ username: "", phone: "", email: "", password: "" });
-        
-      } else {
-        toast.error(res_data.extraDetails ? res_data.extraDetails : res_data.message);
-        
-      }
-    } catch (error) {
-      console.error("register:", error);
-    }
-  };
+  const { AuthorizationToken } = useAuth();
+  const [editUser, setEditUser] = useState(null);
+  const [formData, setFormData] = useState({ username: "", email: "", phone: "" });
 
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
-
+// get all user data
   const getAllUsersData = async () => {
 
     const URL = `${import.meta.env.VITE_API_URL}/api/admin/users`;
@@ -97,26 +50,74 @@ const UserList = () => {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      // console.log(data);
       setUsers(data);
     } catch (error) {
       console.error('Error fetching user data:', error);
 
     }
   };
-
   useEffect(() => {
     getAllUsersData();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filteredUsers = users.filter(
-    (u) =>
-      u.username.toLowerCase().includes(search.toLowerCase()) ||
-      u.email.toLowerCase().includes(search.toLowerCase()) ||
-      u.phone.toLowerCase().includes(search.toLowerCase())
-  );
+
+  const handleEdit = (user) => {
+    setEditUser(user);
+    setFormData(user);
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/update/${editUser._id}`;
+      const response = await fetch(URL, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: AuthorizationToken,
+        },
+        body: JSON.stringify(formData),
+      });
+      setEditUser(null);
+      getAllUsersData();
+      if (response.ok) {
+        toast.success("User updated successfully!");
+        navigate("/admin/users");
+      } else {
+        toast.error("Update failed!.. plc try");
+      }
+
+    } catch (error) {
+      console.error("Update error:", error);
+    }
+  };
+
+  
+  // user delete data
+  const deleteUser = async (id) => {
+    const URL = `${import.meta.env.VITE_API_URL}/api/admin/users/delete/${id}`;
+
+    try {
+      const response = await fetch(URL, {
+        method: 'DELETE',
+        headers: {
+          Authorization: AuthorizationToken,
+        },
+      });
+      const data = await response.json();
+      console.log(`Users after Delete: ${data}`);
+
+      if (response.ok) {
+        getAllUsersData();
+      }
+
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+
+    }
+
+  };
 
 
   return (
@@ -134,22 +135,21 @@ const UserList = () => {
             {/* Right: Actions */}
             <div className="grid grid-flow-col sm:auto-cols-max justify-start sm:justify-end gap-3 items-center">
               {/* UserModal */}
-              <button
-                onClick={openModal}
-                className="btn bg-green-700 text-gray-100 hover:bg-green-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
+              <Link to={"/admin/add-new"}
+                className="btn bg-green-700 text-gray-100 hover:bg-green-800 dark:bg-gray-200 dark:text-gray-800 dark:hover:bg-white"
               >
                 <FaPlus size={16} className='inline-block mr-2' />
                 Add New
-              </button>
+              </Link>
             </div>
           </div>
 
           {/* Cards */}
           <div className="grid grid-cols-1 gap-2">
             <div className="container">
-              <div className="overflow-x-auto bg-white rounded-lg shadow px-4 py-4">
-                {filteredUsers.length > 0 ? (
-                  <DataTable className="w-full table-auto display border-[1px] my-2"
+              <div className="overflow-x-auto bg-white rounded-lg shadow px-4 py-4 dark:bg-gray-700 dark:text-white">
+                {users.length > 0 ? (
+                  <DataTable className="w-full table-auto display border-[1px] my-3"
                     options={{
                       responsive: true,
                       pagination: true,
@@ -165,34 +165,37 @@ const UserList = () => {
                     }}
                   >
                     <thead>
-                      <tr className="text-sm leading-normal text-gray-600 uppercase bg-green-200 items-center justify-center justify-items-center">
-                        <th className="px-6 py-3 text-left">Name</th>
-                        <th className="px-6 py-3 text-left">Email</th>
-                        <th className="px-6 py-3 text-left">Phone</th>
-                        <th className="px-6 py-3 text-left">Role</th>
-                        <th className="px-6 py-3 text-left">Status</th>
-                        <th className="px-6 py-3 text-center">Actions</th>
+                      <tr className="text-sm text-gray-600 uppercase bg-green-200 items-center justify-center justify-items-center">
+                        <th className="px-6 py-3 items-start">Name</th>
+                        <th className="px-6 py-3 items-start">Email</th>
+                        <th className="px-6 py-3 items-start">Phone</th>
+                        <th className="px-6 py-3">Role</th>
+                        <th className="px-6 py-3">Status</th>
+                        <th className="px-6 py-3">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="text-sm text-gray-600">
-                      {filteredUsers.map((row, index) => (
-                        <tr key={index} className="border-b hover:bg-indigo-50 transition border-gray-200">
-                          <td className="px-6 py-3 text-left">{row.username}</td>
-                          <td className="px-6 py-3 text-left">{row.email}</td>
-                          <td className="px-6 py-3 text-left">{row.phone}</td>
-                          <td className="px-6 py-3 text-left">Admin</td>
-                          <td className="px-6 py-3 text-left">
+                    <tbody className="text-sm text-gray-600 dark:text-white items-start">
+                      {users.map((user) => (
+                        <tr key={user._id} className="border hover:bg-indigo-50 transition border-gray-200 dark:border-gray-100">
+                          <td className="px-6 py-3 items-start">{user.username}</td>
+                          <td className="px-6 py-3 items-start">{user.email}</td>
+                          <td className="px-6 py-3 items-start">{user.phone}</td>
+                          <td className="px-6 py-3">Admin</td>
+                          <td className="px-6 py-3">
                             <span className="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">
                               Active
                             </span>
                           </td>
                           <td className="px-6 py-3 text-center">
                             <div className="flex justify-center item-center">
-                              <button className="w-4 mr-2 text-green-500 transform hover:text-blue-500 hover:scale-110">
-                                <FaRegEdit />
+                              <button
+                                onClick={() => handleEdit(user)}
+                                className="w-4 mr-2 text-green-500 transform hover:text-green-700 hover:scale-110">
+                                <FaRegEdit className='w-4.5 h-4.5' />
                               </button>
-                              <button className="w-4 mr-2 text-red-500 transform hover:text-red-500 hover:scale-110">
-                                <RiDeleteBin6Line />
+                              <button onClick={() => deleteUser(user._id)}
+                                className="w-4 mr-2 text-red-500 transform hover:text-red-700 hover:scale-110">
+                                <RiDeleteBin6Line className='w-4.5 h-4.5' />
                               </button>
                             </div>
                           </td>
@@ -201,11 +204,11 @@ const UserList = () => {
                     </tbody>
                   </DataTable>
                 ) : (
-                  <tr>
-                    <td colSpan="3" className="py-4 text-center text-gray-500 italic" >
+                  <div>
+                    <span colSpan="3" className="py-4 text-center text-gray-500 italic" >
                       No users found
-                    </td>
-                  </tr>
+                    </span>
+                  </div>
                 )}
               </div>
             </div>
@@ -213,59 +216,66 @@ const UserList = () => {
         </div>
       </div>
 
+      {/* Modal */}
+      {editUser && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-500/75 z-50 ">
+          <div transition className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95" >
+            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 dark:bg-gray-700 dark:text-white text-sm text-gray-600">
+                <h2 className="text-xl font-semibold mb-4">Edit User</h2>
+              <form onSubmit={handleUpdate}>
+                <label className="block mb-2 font-medium">Name</label>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) =>
+                    setFormData({ ...formData, username: e.target.value })
+                  }
+                  className="border w-full p-2 rounded mb-3 dark:bg-gray-500"
+                  required
+                />
 
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Modal isOpen={isModalOpen} onClose={closeModal} title="Add Users">
-          {/* <h2 className="text-2xl font-bold mb-4">Users</h2> */}
-          <form className="space-y-4" onSubmit={handleUserSubmit}>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-              <div className="mt-1">
-                <input type="text" name='username' id='username' placeholder='Username' required
-                  value={user.username} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone number</label>
-              <div className="mt-1">
-                <input type="number" name='phone' id='phone' placeholder='Phone number' required
-                  value={user.phone} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email address</label>
-              <div className="mt-1">
-                <input type="email" name='email' id='email' placeholder='Email address' required
-                  value={user.email} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-              <div className="mt-1">
-                <input type="password" name='password' id='password' placeholder='Password' required
-                  value={user.password} onChange={handleChange}
-                  className='block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm appearance-none focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm' />
-              </div>
-            </div>
-            <div>
-              <button type="submit"
-                className="justify-center px-4 py-2 text-sm font-medium text-white bg-green-800 border border-transparent rounded-md group hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-wait disabled:opacity-50">
-                Add New
-              </button>
-              <button
-                onClick={closeModal}
-                className="ml-3 mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-              >
-                Close
-              </button>
-            </div>
-          </form>
+                <label className="block mb-2 font-medium">Email</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="border w-full p-2 rounded mb-3 dark:bg-gray-500"
+                  required
+                />
 
-        </Modal>
-      </div>
+                <label className="block mb-2 font-medium">Phone</label>
+                <input
+                  type="number"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  className="border w-full p-2 rounded mb-4 dark:bg-gray-500"
+                  required
+                />
+
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="submit"
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+                  >
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditUser(null)}
+                    className="bg-red-400 text-white px-4 py-2 rounded hover:bg-red-500"
+                  >
+                    Cancel
+                  </button>                  
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

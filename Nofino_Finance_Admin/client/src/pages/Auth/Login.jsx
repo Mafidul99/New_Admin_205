@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import logoPng from '../../../assets/logo/Finance13.png';
-import { useAuth } from '../../../store/auth';
+import logoPng from '../../assets/logo/Finance13.png';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../store/auth';
 
-const AdminLogin = () => {
+const Login = () => {
      const navigate = useNavigate();
     const {storeTokenInLs} = useAuth();
 
@@ -20,12 +20,12 @@ const AdminLogin = () => {
             [name]: value
         });
     };
-    const URL = `${import.meta.env.VITE_API_URL}/api/auth/login`;    
-
+    
+    // const URL = `${import.meta.env.VITE_API_URL}/api/auth/login`;    
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(URL, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -113,4 +113,4 @@ const AdminLogin = () => {
     )
 }
 
-export default AdminLogin
+export default Login
