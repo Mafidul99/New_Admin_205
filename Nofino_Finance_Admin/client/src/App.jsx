@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, Route, Routes } from 'react-router-dom'
+import { useLocation, Route, Routes, Navigate } from 'react-router-dom'
 
 
 import './css/style.css';
@@ -25,6 +25,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 function App() {
 
   const location = useLocation();
+  
 
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto'
@@ -67,6 +68,7 @@ function App() {
 export default App;
 
 const Home = () => {
+  // const Navigate = useNavigate();
   const { user } = useAuth((state) => state.user);
 
   
